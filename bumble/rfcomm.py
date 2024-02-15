@@ -938,6 +938,9 @@ class Multiplexer(EventEmitter):
 
     def on_dlc_open_complete(self, dlc: DLC) -> None:
         logger.debug(f'DLC [{dlc.dlci}] open complete')
+
+        self.change_state(Multiplexer.State.CONNECTED)
+
         if self.open_result:
             self.open_result.set_result(dlc)
             self.open_result = None
