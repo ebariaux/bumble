@@ -113,9 +113,12 @@ class ServerBridge:
         self.channel = rfcomm_server.listen(self.on_rfcomm_channel, self.channel)
 
         # Setup the SDP to advertise this channel
-        self.device.sdp_service_records = rfcomm.make_service_sdp_records(
-            0x00010001, self.channel, core.UUID(self.uuid)
-        )
+        service_record_handle = 0x00010001
+        self.device.sdp_service_records = {
+            service_record_handle: rfcomm.make_service_sdp_records(
+                service_record_handle, self.channel, core.UUID(self.uuid)
+            )
+        }
 
         # We're ready for a connection
         self.device.on("connection", self.on_connection)
@@ -272,6 +275,7 @@ class ClientBridge:
         if self.encrypt:
             print(color("@@@ Encrypting Bluetooth connection", "blue"))
             await self.connection.encrypt()
+            print(color("@@@ Bluetooth connection encrypted", "blue"))
 
         self.rfcomm_client = rfcomm.Client(self.connection)
         self.rfcomm_mux = await self.rfcomm_client.start()
